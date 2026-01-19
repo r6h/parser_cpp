@@ -1,3 +1,5 @@
+#include "tokenizer.h"
+#include "token.h"
 #include <string_view>
 #include <cstddef>
 
@@ -8,7 +10,6 @@ Token Tokenizer::next() {
     }
 
     size_t start = pos_;
-    
     char c = input_[pos_];
 
     // Control characters

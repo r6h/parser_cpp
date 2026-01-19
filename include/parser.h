@@ -11,14 +11,13 @@ public:
     }
 
     Node* parse_document();
+    Node* parse_block();
+    Node* parse_heading();
+    Node* parse_paragraph();
 
 private:
     Tokenizer& tokenizer_;
     Token current_;
 
     void advance();
-}
-
-void Parser::advance() {
-    current_ = tokenizer_.next();
-}
+};

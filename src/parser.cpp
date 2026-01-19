@@ -28,22 +28,68 @@ Node* Parser::parse_block() {
   return parse_paragraph();
 }
 
+Node* Parser::parse_inline() {
+  if (current_.type == TokenType::Text) {
+    Node* text = new Node{Node::Type::Text};
+    text->text = current_.lexeme;
+    advance();
+    return text;
+  }
+
+  if (current_.type == TokenType::Star) {
+    advance();
+    Node* emphasis = new Node{Node::Type::Emphasis};
+
+    // recursively parse inside emphasis
+    Node* child = parse_inline();
+    if (child) {
+      emphasis->children.push_back(child);
+    }
+
+    if (current_.type == TokenType::Star) {
+      advance();
+    }
+
+    return emphasis;
+  }
+
+  if (current_.type == TokenType::Backtick) {
+    advance();
+    Node* code = new Node{Node::Type::InlineCode};
+
+    if (current_.type == TokenType::Text) {
+      Node* child = new Node{Node::Type::Text};
+      child->text = current_.lexeme;
+      code->children.push_back(child);
+      advance();
+    }
+    
+    if (current_.type == TokenType::Backtick) {
+      advance();
+    }
+
+    return code;
+  }
+
+  advance();
+  return nullptr;
+}
+
 Node* Parser::parse_heading() {
   Node *heading = new Node{Node::Type::Heading};
 
-  advance(); // consume '#'
-
+  advance();
+   
   // parse inline content (currently just text)
-  if (current_.type == TokenType::Text) {
-    Node *text = new Node{Node::Type::Text};
-    // trim leading spaces
-    size_t first_non_space = current_.lexeme.find_first_not_of(' ');
-    if (first_non_space != std::string_view::npos) {
-        text->text = current_.lexeme.substr(first_non_space);
-    } else {
-        text->text = "";
-    }
-    heading->children.push_back(text);
+  while (current_.type != TokenType::Newline &&
+          current_.type != TokenType::EndOfFile) {
+
+            Node* child = parse_inline();
+            if (child) {
+              heading->children.push_back(child);
+            }
+  }
+  if (current_.type == TokenType::Newline) {
     advance();
   }
 
@@ -57,21 +103,17 @@ Node* Parser::parse_paragraph() {
   while (current_.type != TokenType::Newline &&
           current_.type != TokenType::EndOfFile) {
         
-        // just handling text for now
-        if (current_.type == TokenType::Text) {
-          Node* text = new Node{Node::Type::Text};
-          text->text = current_.lexeme;
-          
-          paragraph->children.push_back(text); 
+        Node* child = parse_inline();
+        if (child) {
+          paragraph->children.push_back(child);
         }
-        advance();
-      }
+  }
 
-      if (current_.type == TokenType::Newline) {
-        advance();
-      }
-
-      return paragraph;
+  if (current_.type == TokenType::Newline) {
+    advance();
+  }
+  
+  return paragraph;
 }
 
 void Parser::advance() {

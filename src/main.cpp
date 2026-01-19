@@ -10,7 +10,9 @@ std::string node_type_to_string(Node::Type type) {
         case Node::Type::Document:    return "Document";
         case Node::Type::Heading:     return "Heading";
         case Node::Type::Paragraph:   return "Paragraph";
-        case Node::Type::Text:        return "Text"; 
+        case Node::Type::Text:        return "Text";
+        case Node::Type::Emphasis:    return "Emphasis";
+        case Node::Type::InlineCode:  return "InlineCode";
     }
     return "Unknown";
 }
@@ -42,7 +44,7 @@ void free_ast(Node* node) {
 }
 
 int main() {
-    std::string input = "# Heading\nThis is a paragraph.";
+    std::string input = "# Heading\nThis is a paragraph.\nThis is `code`";
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
     Node* ast = parser.parse_document();

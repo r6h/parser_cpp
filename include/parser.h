@@ -14,6 +14,7 @@ public:
     Node* parse_block();
     Node* parse_heading();
     Node* parse_paragraph();
+    Node* parse_inline();
 
 private:
     Tokenizer& tokenizer_;

@@ -6,8 +6,13 @@ Node* Parser::parse_document() {
   Node *document = new Node{Node::Type::Document};
 
   while (current_.type != TokenType::EndOfFile) {
-    Node *block = parse_block();
+      // skip newlines between blocks
+      while (current_.type == TokenType::Newline) {
+        advance();
+      }
+      if (current_.type == TokenType::EndOfFile) break;
 
+    Node *block = parse_block();
     document->children.push_back(block);
   }
 
@@ -31,8 +36,13 @@ Node* Parser::parse_heading() {
   // parse inline content (currently just text)
   if (current_.type == TokenType::Text) {
     Node *text = new Node{Node::Type::Text};
-    text->text = current_.lexeme;
-
+    // trim leading spaces
+    size_t first_non_space = current_.lexeme.find_first_not_of(' ');
+    if (first_non_space != std::string_view::npos) {
+        text->text = current_.lexeme.substr(first_non_space);
+    } else {
+        text->text = "";
+    }
     heading->children.push_back(text);
     advance();
   }

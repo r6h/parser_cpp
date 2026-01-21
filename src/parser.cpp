@@ -38,13 +38,20 @@ Node* Parser::parse_inline() {
 
   if (current_.type == TokenType::Star) {
     advance();
+
     Node* emphasis = new Node{Node::Type::Emphasis};
 
-    // recursively parse inside emphasis
-    Node* child = parse_inline();
-    if (child) {
-      emphasis->children.push_back(child);
-    }
+    while (current_.type != TokenType::Star &&
+          current_.type != TokenType::Newline &&
+          current_.type != TokenType::EndOfFile) {
+
+            // recursively parse inside emphasis
+            Node* child = parse_inline();
+            if (child) {
+              emphasis->children.push_back(child);
+            }
+          }
+    
 
     if (current_.type == TokenType::Star) {
       advance();

@@ -17,9 +17,11 @@ std::string node_type_to_string(Node::Type type) {
     return "Unknown";
 }
 
-void print_ast(Node* node, int indent = 0) {
-    for (int i = 0; i < indent; ++i) {
-        std::cout << " ";
+void print_ast(Node* node, const std::string& prefix = "", bool is_last = true) {
+    std::cout << prefix;
+
+    if (!prefix.empty()) {
+        std::cout << (is_last ? "└── " : "├── ");
     }
 
     std::cout << node_type_to_string(node->type);
@@ -30,9 +32,11 @@ void print_ast(Node* node, int indent = 0) {
 
     std::cout << "\n";
 
-    // recursively print children
-    for (Node* child : node->children) {
-        print_ast(child, indent + 1);
+    std::string new_prefix = prefix + (is_last ? "    " : "|   ");
+
+    for (size_t i = 0; i < node->children.size(); ++i) {
+        bool last = (i == node->children.size() -1);
+        print_ast(node->children[i], new_prefix, last);
     }
 }
 
@@ -44,7 +48,7 @@ void free_ast(Node* node) {
 }
 
 int main() {
-    std::string input = "# Heading\nThis is a paragraph.This is `code`";
+    std::string input = "# Heading\nThis is a paragraph. This is `code`";
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
     Node* ast = parser.parse_document();

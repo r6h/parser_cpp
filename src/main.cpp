@@ -44,7 +44,7 @@ void free_ast(Node* node) {
 }
 
 int main() {
-    std::string input = "# Heading\nThis is a paragraph.\nThis is `code`";
+    std::string input = "# Heading\nThis is a paragraph.This is `code`";
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
     Node* ast = parser.parse_document();

@@ -80,7 +80,13 @@ Node* Parser::parse_heading() {
 
   advance();
    
-  // parse inline content (currently just text)
+  // skip exactly one optional space after the hash for proper markdown rules
+  if (current_.type == TokenType::Text &&
+      !current_.lexeme.empty() &&
+      current_.lexeme.front() == ' ') {
+        current_.lexeme.remove_prefix(1);
+      }
+
   while (current_.type != TokenType::Newline &&
           current_.type != TokenType::EndOfFile) {
 

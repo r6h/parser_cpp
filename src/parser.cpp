@@ -2,8 +2,8 @@
 #include "ast.h"
 #include <cstdlib>
 
-Node* Parser::parse_document() {
-  Node *document = new Node{Node::Type::Document};
+std::unique_ptr<Node> Parser::parse_document() {
+  auto document = std::make_unique<Node>(Node::Type::Document);
 
   while (current_.type != TokenType::EndOfFile) {
       // skip newlines between blocks
@@ -13,7 +13,7 @@ Node* Parser::parse_document() {
       if (current_.type == TokenType::EndOfFile) break;
 
     Node *block = parse_block();
-    document->children.push_back(block);
+    document->children.push_back(std::move(block));
   }
 
   return document;
@@ -28,9 +28,9 @@ Node* Parser::parse_block() {
   return parse_paragraph();
 }
 
-Node* Parser::parse_inline() {
+std::unique_ptr<Node> Parser::parse_inline() {
   if (current_.type == TokenType::Text) {
-    Node* text = new Node{Node::Type::Text};
+    auto text = std::make_unique<Node>(Node::Type::Text);
     text->text = current_.lexeme;
     advance();
     return text;
@@ -39,7 +39,7 @@ Node* Parser::parse_inline() {
   if (current_.type == TokenType::Star) {
     advance();
 
-    Node* emphasis = new Node{Node::Type::Emphasis};
+    auto emphasis = std::make_unique<Node>(Node::Type::Emphasis);
 
     while (current_.type != TokenType::Star &&
           current_.type != TokenType::Newline &&
@@ -62,12 +62,12 @@ Node* Parser::parse_inline() {
 
   if (current_.type == TokenType::Backtick) {
     advance();
-    Node* code = new Node{Node::Type::InlineCode};
+    auto code = std::make_unique<Node>(Node::Type::InlineCode);
 
     if (current_.type == TokenType::Text) {
       Node* child = new Node{Node::Type::Text};
       child->text = current_.lexeme;
-      code->children.push_back(child);
+      code->children.push_back(std::move(child));
       advance();
     }
     
@@ -82,8 +82,8 @@ Node* Parser::parse_inline() {
   return nullptr;
 }
 
-Node* Parser::parse_heading() {
-  Node *heading = new Node{Node::Type::Heading};
+std::unique_ptr<Node> Parser::parse_heading() {
+  auto heading = std::make_unique<Node>(Node::Type::Heading);
 
   advance();
    
@@ -97,9 +97,9 @@ Node* Parser::parse_heading() {
   while (current_.type != TokenType::Newline &&
           current_.type != TokenType::EndOfFile) {
 
-            Node* child = parse_inline();
+            auto child = parse_inline();
             if (child) {
-              heading->children.push_back(child);
+              heading->children.push_back(std::move(child));
             }
   }
   if (current_.type == TokenType::Newline) {

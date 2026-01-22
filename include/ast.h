@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 
 struct Node {
     enum class Type {
@@ -14,5 +15,7 @@ struct Node {
 
     Type type;
     std::string text;
-    std::vector<Node*> children;
+    std::vector<std::unique_ptr<Node>> children;
+
+    explicit Node(Type t) : type(t) {}
 };

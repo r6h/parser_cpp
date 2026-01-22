@@ -10,11 +10,11 @@ public:
         current_ = tokenizer_.next();
     }
 
-    Node* parse_document();
-    Node* parse_block();
-    Node* parse_heading();
-    Node* parse_paragraph();
-    Node* parse_inline();
+    std::unique_ptr<Node> parse_document();
+    std::unique_ptr<Node> parse_block();
+    std::unique_ptr<Node> parse_heading();
+    std::unique_ptr<Node> parse_paragraph();
+    std::unique_ptr<Node> parse_inline();
 
 private:
     Tokenizer& tokenizer_;

@@ -2,6 +2,21 @@
 #include "ast.h"
 #include <cstdlib>
 
+void Parser::parse_inlines_into(
+  std::vector<std::unique_ptr<Node>>& out,
+  TokenType stop
+) {
+  while (current_.type != stop && 
+        current_.type != TokenType::EndOfFile) {
+
+          auto node = parse_inline();
+
+          if (node) {
+            out.push_back(std::move(node));
+          }
+        }
+}
+
 std::unique_ptr<Node> Parser::parse_document() {
   auto document = std::make_unique<Node>(Node::Type::Document);
 
@@ -94,14 +109,8 @@ std::unique_ptr<Node> Parser::parse_heading() {
         current_.lexeme.remove_prefix(1);
       }
 
-  while (current_.type != TokenType::Newline &&
-          current_.type != TokenType::EndOfFile) {
+  parse_inlines_into(heading->children, TokenType::Newline);
 
-            auto child = parse_inline();
-            if (child) {
-              heading->children.push_back(std::move(child));
-            }
-  }
   if (current_.type == TokenType::Newline) {
     advance();
   }
@@ -112,15 +121,7 @@ std::unique_ptr<Node> Parser::parse_heading() {
 std::unique_ptr<Node> Parser::parse_paragraph() {
   auto paragraph = std::make_unique<Node>(Node::Type::Paragraph);
 
-  // consume tokens until newline or EOF
-  while (current_.type != TokenType::Newline &&
-          current_.type != TokenType::EndOfFile) {
-
-        auto child = parse_inline();
-        if (child) {
-          paragraph->children.push_back(std::move(child));
-        }
-  }
+  parse_inlines_into(paragraph->children, TokenType::Newline);
 
   if (current_.type == TokenType::Newline) {
     advance();

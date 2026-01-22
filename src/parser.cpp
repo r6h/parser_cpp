@@ -12,14 +12,16 @@ std::unique_ptr<Node> Parser::parse_document() {
       }
       if (current_.type == TokenType::EndOfFile) break;
 
-    Node *block = parse_block();
-    document->children.push_back(std::move(block));
+    auto block = parse_block();
+    if (block) {
+      document->children.push_back(std::move(block));
+    }
   }
 
   return document;
 }
 
-Node* Parser::parse_block() {
+std::unique_ptr<Node> Parser::parse_block() {
   if (current_.type == TokenType::Hash) {
     return parse_heading();
   }
@@ -45,13 +47,11 @@ std::unique_ptr<Node> Parser::parse_inline() {
           current_.type != TokenType::Newline &&
           current_.type != TokenType::EndOfFile) {
 
-            // recursively parse inside emphasis
-            Node* child = parse_inline();
+            auto child = parse_inline();
             if (child) {
-              emphasis->children.push_back(child);
+              emphasis->children.push_back(std::move(child));
             }
           }
-    
 
     if (current_.type == TokenType::Star) {
       advance();
@@ -65,12 +65,12 @@ std::unique_ptr<Node> Parser::parse_inline() {
     auto code = std::make_unique<Node>(Node::Type::InlineCode);
 
     if (current_.type == TokenType::Text) {
-      Node* child = new Node{Node::Type::Text};
+      auto child = std::make_unique<Node>(Node::Type::Text);
       child->text = current_.lexeme;
       code->children.push_back(std::move(child));
       advance();
     }
-    
+
     if (current_.type == TokenType::Backtick) {
       advance();
     }
@@ -86,7 +86,7 @@ std::unique_ptr<Node> Parser::parse_heading() {
   auto heading = std::make_unique<Node>(Node::Type::Heading);
 
   advance();
-   
+
   // skip exactly one optional space after the hash for proper markdown rules
   if (current_.type == TokenType::Text &&
       !current_.lexeme.empty() &&
@@ -109,23 +109,23 @@ std::unique_ptr<Node> Parser::parse_heading() {
   return heading;
 }
 
-Node* Parser::parse_paragraph() {
-  Node* paragraph = new Node{Node::Type::Paragraph};
+std::unique_ptr<Node> Parser::parse_paragraph() {
+  auto paragraph = std::make_unique<Node>(Node::Type::Paragraph);
 
   // consume tokens until newline or EOF
   while (current_.type != TokenType::Newline &&
           current_.type != TokenType::EndOfFile) {
-        
-        Node* child = parse_inline();
+
+        auto child = parse_inline();
         if (child) {
-          paragraph->children.push_back(child);
+          paragraph->children.push_back(std::move(child));
         }
   }
 
   if (current_.type == TokenType::Newline) {
     advance();
   }
-  
+
   return paragraph;
 }
 

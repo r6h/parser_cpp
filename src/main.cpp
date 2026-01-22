@@ -35,24 +35,15 @@ void print_ast(Node* node, const std::string& prefix = "", bool is_last = true) 
     std::string new_prefix = prefix + (is_last ? "    " : "|   ");
 
     for (size_t i = 0; i < node->children.size(); ++i) {
-        bool last = (i == node->children.size() -1);
-        print_ast(node->children[i], new_prefix, last);
+        print_ast(node->children[i].get(), new_prefix, i + 1 == node->children.size());
     }
-}
-
-void free_ast(Node* node) {
-    for (Node* child : node->children) {
-        free_ast(child);
-    }
-    delete node;
 }
 
 int main() {
     std::string input = "# Heading\nThis is a paragraph. This is `code`";
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
-    Node* ast = parser.parse_document();
-    print_ast(ast);
-    free_ast(ast);
+    auto ast = parser.parse_document();
+    print_ast(ast.get());
     return 0;
 }

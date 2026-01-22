@@ -21,4 +21,7 @@ private:
     Token current_;
 
     void advance();
+
+    void parse_inlines_into(std::vector<std::unique_ptr<Node>>& out,
+                            TokenType stop);
 };

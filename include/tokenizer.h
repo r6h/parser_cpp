@@ -8,6 +8,7 @@ class Tokenizer {
             : input_(input), pos_(0) {}
 
         Token next();
+        Token peek(size_t n);
 
     private:
         const std::string& input_;

@@ -1,21 +1,26 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 struct Node {
-    enum class Type {
-        Document,
-        Paragraph,
-        Heading,
-        Text,
-        Emphasis,
-        InlineCode
-    };
+  enum class Type {
+    Document,
+    Paragraph,
+    Heading,
+    Text,
+    Emphasis,
+    InlineCode,
+    Strong,
+    CodeBlock
+  };
 
-    Type type;
-    std::string text;
-    std::vector<std::unique_ptr<Node>> children;
+  Type type;
 
-    explicit Node(Type t) : type(t) {}
+  std::string text;
+  std::string code;
+
+  std::vector<std::unique_ptr<Node>> children;
+
+  explicit Node(Type t) : type(t) {}
 };

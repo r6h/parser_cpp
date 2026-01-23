@@ -15,6 +15,7 @@ public:
     std::unique_ptr<Node> parse_heading();
     std::unique_ptr<Node> parse_paragraph();
     std::unique_ptr<Node> parse_inline();
+    std::unique_ptr<Node> parse_code_block();
 
 private:
     Tokenizer& tokenizer_;

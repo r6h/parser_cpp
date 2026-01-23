@@ -3,6 +3,7 @@
 #include "tokenizer.h"
 #include "parser.h"
 #include "ast.h"
+#include "renderer.h"
 
 // little helper to convert enum to text for better debugging
 std::string node_type_to_string(Node::Type type) {
@@ -40,10 +41,11 @@ void print_ast(Node* node, const std::string& prefix = "", bool is_last = true) 
 }
 
 int main() {
-    std::string input = "# Heading\nThis is a paragraph. This is `code`";
+    std::string input = "# Heading\nThis is a paragraph. This is `some program`, and this *is bold*";
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
-    auto ast = parser.parse_document();
-    print_ast(ast.get());
+    auto document = parser.parse_document();
+    print_ast(document.get());
+    std::cout << render_html(*document);
     return 0;
 }

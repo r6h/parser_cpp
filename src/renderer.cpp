@@ -1,6 +1,24 @@
 #include "renderer.h"
 #include <sstream>
 
+static std::string escape_html(std::string_view text) {
+    std::string out;
+    out.reserve(text.size());
+
+    for (char c : text) {
+        switch (c) {
+            case '&':  out += "&amp;";  break;
+            case '<':  out += "&lt;";   break;
+            case '>':  out += "&gt;";   break;
+            case '"':  out += "&quot;"; break;
+            case '\'': out += "&#39;";  break;
+            default:   out += c;        break;
+        }
+    }
+
+    return out;
+}
+
 std::string render_html(const Node& node) {
     std::ostringstream html;
 
@@ -28,7 +46,7 @@ std::string render_html(const Node& node) {
             break;
 
         case Node::Type::Text:
-            html << node.text;
+            html << escape_html(node.text);
             break;
 
         case Node::Type::InlineCode:

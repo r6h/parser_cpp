@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "ast.h"
 #include <cstdlib>
+#include <cassert>
 
 void Parser::parse_inlines_into(std::vector<std::unique_ptr<Node>> &out,
                                 TokenType stop) {

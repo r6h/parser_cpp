@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+#include <cassert>
 #include "token.h"
 #include <cstddef>
 #include <string_view>
@@ -50,5 +51,9 @@ Token Tokenizer::peek(size_t n) {
   }
 
   pos_ = saved_pos;
+
+  // invariant check
+  assert(pos_ == saved_pos);
+  
   return t;
 }

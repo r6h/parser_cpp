@@ -13,4 +13,5 @@ class Tokenizer {
     private:
         const std::string& input_;
         size_t pos_;
+        bool is_fence_start(size_t pos) const;
 };

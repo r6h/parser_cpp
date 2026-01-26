@@ -42,13 +42,13 @@ std::unique_ptr<Node> Parser::parse_block() {
     return parse_heading();
   }
 
-  if (current_.type == TokenType::Backtick &&
-      tokenizer_.peek(1).type == TokenType::Backtick &&
-      tokenizer_.peek(2).type == TokenType::Backtick) {
+  if (current_.type == TokenType::Fence) {
         return parse_code_block();
       }
-
-  // temp fallback
+  
+  if (current_.type == TokenType::Fence) {
+    return parse_code_block();
+  }
   return parse_paragraph();
 }
 
@@ -162,31 +162,35 @@ std::unique_ptr<Node> Parser::parse_code_block() {
   auto block = std::make_unique<Node>(Node::Type::CodeBlock);
 
   advance();
-  advance();
-  advance();
 
-  if (current_.type == TokenType::Newline)
+  if (current_.type == TokenType::Text) {
+    block->info = std::string(current_.lexeme);
     advance();
+  }
+
+  if (current_.type == TokenType::Newline) {
+    advance();
+  }
   
-  while (!(current_.type == TokenType::Backtick &&
-          tokenizer_.peek(1).type == TokenType::Backtick &&
-          tokenizer_.peek(2).type == TokenType::Backtick)) {
+  while (current_.type != TokenType::Fence &&
+           current_.type != TokenType::EndOfFile) {
 
-            if (current_.type == TokenType::EndOfFile)
-              break;
-
+        if (current_.type == TokenType::Text ||
+            current_.type == TokenType::Newline) {
             block->text += current_.lexeme;
-            advance();
-          }
-  
-  advance();
-  advance();
-  advance();
+            }
+          advance();
+        }
 
-  if (current_.type == TokenType::Newline)
-    advance();
+        if (current_.type == TokenType::Fence) {
+          advance(); // closing ```
+        }
+      
+        if (current_.type == TokenType::Newline) {
+          advance();
+        }
 
-  return block;
+    return block;
 }
 
 void Parser::advance() {

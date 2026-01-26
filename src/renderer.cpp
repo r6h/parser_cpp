@@ -74,9 +74,13 @@ std::string render_html(const Node& node) {
             break;
 
         case Node::Type::CodeBlock:
-            html << "<pre><code>";
-            html << node.text;
-            html << "</code></pre>\n";
+            html << "<pre><code";
+            if (!node.info.empty()) {
+                html << " class\"language-" << node.info << "\"";
+            }
+            html << ">\n";
+            html << escape_html(node.text);
+            html << "\n</code></pre>\n";
             break;
     }
 

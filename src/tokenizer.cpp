@@ -4,6 +4,14 @@
 #include <cstddef>
 #include <string_view>
 
+// helper to detect start of code block fence (```)
+bool Tokenizer::is_fence_start(size_t pos) const {
+  return pos + 2 < input_.size() &&
+       input_[pos] == '`' &&
+       input_[pos+1] == '`' &&
+       input_[pos+2] == '`';
+}
+
 Token Tokenizer::next() {
 
   if (pos_ >= input_.size()) {
@@ -23,6 +31,12 @@ Token Tokenizer::next() {
     return Token{TokenType::Star, {}, start};
   }
   if (c == '`') {
+    // check for fence (```)
+    if (is_fence_start(pos_)) {
+      size_t start = pos_;
+      pos_ += 3;
+      return Token{TokenType::Fence, std::string_view(&input_[start], 3), start};
+    }
     pos_++;
     return Token{TokenType::Backtick, {}, start};
   }

@@ -19,6 +19,7 @@ struct Node {
 
   std::string text;
   std::string code;
+  std::string info;
 
   std::vector<std::unique_ptr<Node>> children;
 

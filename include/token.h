@@ -6,6 +6,7 @@ enum class TokenType {
     Hash,
     Star,
     Backtick,
+    Fence,
     Text,
     Newline,
     EndOfFile

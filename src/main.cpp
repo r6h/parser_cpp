@@ -61,6 +61,7 @@ const char* token_type_to_string(TokenType t) {
     case TokenType::Text: return "Text";
     case TokenType::EndOfFile: return "EOF";
     case TokenType::Backtick: return "Backtick";
+    case TokenType::Fence: return "Fence";
     case TokenType::Newline: return "Newline";
     }
     return "Unknown";
@@ -108,7 +109,7 @@ int main() {
   test_peek_does_not_advance();
 
   std::string input = "# Heading\nThis is a paragraph. This is `some program`, "
-                      "and this *is emphasis.* \n```Now we enter a code block!```\n**bold text**";
+                      "and this *is emphasis.* \n```cpp\nNow we enter a C++ code block!```\n**bold text**";
   Tokenizer tokenizer(input);
   Parser parser(tokenizer);
   auto document = parser.parse_document();

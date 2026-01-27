@@ -42,6 +42,9 @@ void print_ast(Node *node, const std::string &prefix = "",
   if (node->type == Node::Type::Text) {
     std::cout << "(\"" << node->text << "\")";
   }
+  if (node->type == Node::Type::CodeBlock) {
+    std::cout << "(\"" << node->text << "\")";
+  }
 
   std::cout << "\n";
 

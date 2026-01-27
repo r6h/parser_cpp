@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <cassert>
 
-void Parser::parse_inlines_into(std::vector<std::unique_ptr<Node>> &out,
+void Parser::parse_inlines_into(std::vector<std::unique_ptr<Node>>& out,
                                 TokenType stop) {
   while (current_.type != stop && current_.type != TokenType::EndOfFile) {
     auto node = parse_inline();
@@ -149,9 +149,37 @@ std::unique_ptr<Node> Parser::parse_heading() {
 std::unique_ptr<Node> Parser::parse_paragraph() {
   auto paragraph = std::make_unique<Node>(Node::Type::Paragraph);
 
-  parse_inlines_into(paragraph->children, TokenType::Newline);
+  size_t newline_count = 0;
 
-  if (current_.type == TokenType::Newline) {
+  while (current_.type != TokenType::EndOfFile) {
+    // check for block-level tokens that end paragraphs
+    if (current_.type == TokenType::Hash || current_.type == TokenType::Fence) {
+      break;
+    }
+
+    if (current_.type == TokenType::Newline) {
+      newline_count++;
+      if (newline_count >= 2) {
+        // double newline = blank line = end of paragraph
+        break;
+      }
+      advance();
+      continue;
+    }
+
+    // reset newline counter when we hit non-newline content
+    newline_count = 0;
+
+    auto child = parse_inline();
+    if (child) {
+      paragraph->children.push_back(std::move(child));
+    } else {
+      advance();
+    }
+  }
+
+  // Consume any remaining newlines after the paragraph
+  while (current_.type == TokenType::Newline) {
     advance();
   }
 

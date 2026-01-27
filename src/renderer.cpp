@@ -76,7 +76,7 @@ std::string render_html(const Node& node) {
         case Node::Type::CodeBlock:
             html << "<pre><code";
             if (!node.info.empty()) {
-                html << " class\"language-" << node.info << "\"";
+                html << " class=\"language-" << node.info << "\"";
             }
             html << ">\n";
             html << escape_html(node.text);

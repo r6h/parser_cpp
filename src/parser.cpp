@@ -5,6 +5,7 @@
 
 void Parser::parse_inlines_into(std::vector<std::unique_ptr<Node>>& out,
                                 TokenType stop) {
+  if (error_) return;
   while (current_.type != stop && current_.type != TokenType::EndOfFile) {
     auto node = parse_inline();
 
@@ -18,6 +19,7 @@ void Parser::parse_inlines_into(std::vector<std::unique_ptr<Node>>& out,
 }
 
 std::unique_ptr<Node> Parser::parse_document() {
+  if (error_) return nullptr;
   auto document = std::make_unique<Node>(Node::Type::Document);
 
   while (current_.type != TokenType::EndOfFile) {
@@ -38,6 +40,7 @@ std::unique_ptr<Node> Parser::parse_document() {
 }
 
 std::unique_ptr<Node> Parser::parse_block() {
+  if (error_) return nullptr;
   if (current_.type == TokenType::Hash) {
     return parse_heading();
   }
@@ -53,6 +56,7 @@ std::unique_ptr<Node> Parser::parse_block() {
 }
 
 std::unique_ptr<Node> Parser::parse_inline() {
+  if (error_) return nullptr;
   if (current_.type == TokenType::Text) {
     auto text = std::make_unique<Node>(Node::Type::Text);
     text->text = current_.lexeme;
@@ -127,6 +131,7 @@ std::unique_ptr<Node> Parser::parse_inline() {
 }
 
 std::unique_ptr<Node> Parser::parse_heading() {
+  if (error_) return nullptr;
   auto heading = std::make_unique<Node>(Node::Type::Heading);
 
   advance();
@@ -147,6 +152,7 @@ std::unique_ptr<Node> Parser::parse_heading() {
 }
 
 std::unique_ptr<Node> Parser::parse_paragraph() {
+  if (error_) return nullptr;
   auto paragraph = std::make_unique<Node>(Node::Type::Paragraph);
 
   size_t newline_count = 0;
@@ -187,6 +193,7 @@ std::unique_ptr<Node> Parser::parse_paragraph() {
 }
 
 std::unique_ptr<Node> Parser::parse_code_block() {
+  if (error_) return nullptr;
   auto block = std::make_unique<Node>(Node::Type::CodeBlock);
 
   advance();
@@ -223,4 +230,10 @@ std::unique_ptr<Node> Parser::parse_code_block() {
 
 void Parser::advance() {
   current_ = tokenizer_.next();
+}
+
+void Parser::error(const std::string& msg) {
+    if (!error_) {
+        error_ = ParseError{msg, current_.position};
+    }
 }

@@ -12,8 +12,13 @@ enum class TokenType {
     EndOfFile
 };
 
+struct SourcePos {
+    size_t line;
+    size_t column;
+};
+
 struct Token {
     TokenType type;
     std::string_view lexeme;
-    size_t position;
+    SourcePos position;
 };

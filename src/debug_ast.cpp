@@ -6,6 +6,17 @@
 #include <string>
 #include <cassert>
 
+// little helper to escape newlines for display in debug output
+std::string escape_newlines_for_display(const std::string_view text) {
+  std::string result(text);
+  size_t pos = 0;
+  while ((pos = result.find('\n', pos)) != std::string::npos) {
+    result.replace(pos, 1, "\\n");
+    pos += 2;  // skip past the replacement
+  }
+  return result;
+}
+
 // little helper to convert enum to text for better debugging
 std::string node_type_to_string(Node::Type type) {
   switch (type) {
@@ -40,10 +51,10 @@ void print_ast(Node *node, const std::string &prefix = "",
   std::cout << node_type_to_string(node->type);
 
   if (node->type == Node::Type::Text) {
-    std::cout << "(\"" << node->text << "\")";
+    std::cout << "(\"" << escape_newlines_for_display(node->text) << "\")";
   }
   if (node->type == Node::Type::CodeBlock) {
-    std::cout << "(\"" << node->text << "\")";
+    std::cout << "(\"" << escape_newlines_for_display(node->text) << "\")";
   }
 
   std::cout << "\n";
@@ -112,7 +123,7 @@ int main() {
   test_peek_does_not_advance();
 
   std::string input = "# Heading\nThis is a paragraph. This is `some program`, "
-                      "and this *is emphasis.* \n```cpp\nNow we enter a C++ code block!```\n**bold text**";
+                      "and this *is emphasis.* \n```cpp\nNow we enter a C++ code block!\nInline code std::vector<int** T>```\n**bold text**";
   Tokenizer tokenizer(input);
   Parser parser(tokenizer);
   auto document = parser.parse_document();

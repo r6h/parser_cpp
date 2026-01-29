@@ -210,12 +210,24 @@ std::unique_ptr<Node> Parser::parse_code_block() {
   while (current_.type != TokenType::Fence &&
            current_.type != TokenType::EndOfFile) {
 
-        if (current_.type == TokenType::Text ||
-            current_.type == TokenType::Newline) {
+        if (current_.type == TokenType::Text) {
             block->text += current_.lexeme;
-            }
-          advance();
+        } else if (current_.type == TokenType::Newline) {
+            block->text += '\n';
+        } else if (current_.type == TokenType::Star) {
+            block->text += '*';
+        } else if (current_.type == TokenType::Backtick) {
+            block->text += '`';
+        } else if (current_.type == TokenType::Hash) {
+            block->text += '#';
         }
+        advance();
+    }
+
+    // remove trailing newline if present (common in code blocks)
+    if (!block->text.empty() && block->text.back() == '\n') {
+        block->text.pop_back();
+    }
 
         if (current_.type == TokenType::Fence) {
           advance(); // closing ```

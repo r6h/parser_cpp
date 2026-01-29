@@ -17,6 +17,8 @@ struct Node {
 
   Type type;
 
+  int heading_level = 0;
+
   std::string text;
   std::string code;
   std::string info;

@@ -9,6 +9,7 @@ bool is_block_node(const Node& node) {
            node.type == Node::Type::CodeBlock;
 }
 
+// Inline code ignores nested structure and renders as raw text
 std::string collect_inline_text(const Node& node) {
     if (node.type == Node::Type::Text) {
         return node.text;
@@ -65,7 +66,7 @@ ir::Block lower_block(const Node& node) {
     switch (node.type) {
         case Node::Type::Heading:
             block.kind = ir::BlockKind::Heading;
-            block.level = 1;
+            block.level = node.heading_level;
             block.content = lower_inlines(node.children);
             break;
         case Node::Type::Paragraph:

@@ -134,7 +134,12 @@ std::unique_ptr<Node> Parser::parse_heading() {
   if (error_) return nullptr;
   auto heading = std::make_unique<Node>(Node::Type::Heading);
 
-  advance();
+  int level = 0;
+  while (current_.type == TokenType::Hash) {
+    level++;
+    advance();
+  }
+  heading->heading_level = level;
 
   // skip exactly one optional space after the hash for proper markdown rules
   if (current_.type == TokenType::Text && !current_.lexeme.empty() &&

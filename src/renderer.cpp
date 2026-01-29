@@ -52,11 +52,15 @@ static void render_inline_html(std::ostringstream& html, const ir::Inline& inlin
 
 static void render_block_html(std::ostringstream& html, const ir::Block& block) {
     switch (block.kind) {
-        case ir::BlockKind::Heading:
-            html << "<h" << block.level << ">";
+        case ir::BlockKind::Heading: {
+            int level = block.level;
+            if (level < 1) level = 1;      // minimum level is 1
+            if (level > 6) level = 6;      // maximum level is 6 (HTML limit)
+            html << "<h" << level << ">";
             render_inlines_html(html, block.content);
-            html << "</h" << block.level << ">\n";
+            html << "</h" << level << ">\n";
             break;
+        }
         case ir::BlockKind::Paragraph:
             html << "<p>";
             render_inlines_html(html, block.content);

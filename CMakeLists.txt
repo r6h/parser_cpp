@@ -9,6 +9,7 @@ set(SOURCES
     src/tokenizer.cpp
     src/parser.cpp
     src/renderer.cpp
+    src/lowering.cpp
 )
 
 # Binary 1: md2html

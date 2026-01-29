@@ -5,6 +5,7 @@
 #include "tokenizer.h"
 #include "parser.h"
 #include "renderer.h"
+#include "lowering.h"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -28,7 +29,8 @@ int main(int argc, char** argv) {
     Tokenizer tokenizer(input);
     Parser parser(tokenizer);
     auto ast = parser.parse_document();
+    auto ir_doc = lower_to_ir(*ast);
 
-    std::cout << render_html(*ast);
+    std::cout << render_html(ir_doc);
     return 0;
 }

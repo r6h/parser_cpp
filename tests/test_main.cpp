@@ -7,6 +7,7 @@
 #include "tokenizer.h"
 #include "parser.h"
 #include "renderer.h"
+#include "lowering.h"
 
 std::string read_file(const std::string& path) {
     std::ifstream file(path);
@@ -22,8 +23,9 @@ void run_gold_tests(const std::string& md_path, const std::string& html_path) {
     Tokenizer tokenizer(input);
     Parser parse(tokenizer);
     auto ast = parse.parse_document();
+    auto ir_doc = lower_to_ir(*ast);
 
-    std::string actual = render_html(*ast);
+    std::string actual = render_html(ir_doc);
 
     if (actual != expected) {
         std::cerr << "[X] Test failed: " << md_path << "\n";

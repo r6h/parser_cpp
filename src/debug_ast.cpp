@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "parser.h"
 #include "renderer.h"
+#include "lowering.h"
 #include "tokenizer.h"
 #include <iostream>
 #include <string>
@@ -113,7 +114,9 @@ void test_html_escaping() {
     Node n(Node::Type::Text);
     n.text = "<>&\"'";
 
-    std::string out = render_html(n);
+    // Convert AST to IR before rendering
+    auto ir_doc = lower_to_ir(n);
+    std::string out = render_html(ir_doc);
     assert(out == "&lt;&gt;&amp;&quot;&#39;");
 }
 
@@ -128,6 +131,9 @@ int main() {
   Parser parser(tokenizer);
   auto document = parser.parse_document();
   print_ast(document.get());
-  std::cout << render_html(*document);
+  
+  // Convert AST to IR before rendering
+  auto ir_doc = lower_to_ir(*document);
+  std::cout << render_html(ir_doc);
   return 0;
 }
